@@ -14,6 +14,7 @@ class DashModelFactory(private val repository: DashRepo) : ViewModelProvider.Fac
         else if (modelClass.isAssignableFrom(CreateViewModel::class.java)) {
             return CreateViewModel(repository) as T
         }
+
         throw IllegalAccessException("Unknown view model")
     }
 }

@@ -30,9 +30,9 @@ val viewModelModule = module {
     viewModel { WeatherViewModel(get()) }
 }
 
-
 val repoModule = module {
     single<WeatherRepo> { WeatherRepoImp(get()) }
+
     single { DashRepo(get()) }
 }
 

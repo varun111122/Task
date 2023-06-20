@@ -33,9 +33,8 @@ import kotlinx.coroutines.launch
 class WeatherFragment : BaseFragment<FragmentWeatherBinding>(), View.OnClickListener {
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var lastLocation: Location? = null
-
-    lateinit var viewModel: DashboardViewModel
     private val weatherViewModel: WeatherViewModel by viewModels()
+    lateinit var viewModel: DashboardViewModel
 
 
     override fun getLayoutRes() = R.layout.fragment_weather
@@ -106,7 +105,7 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(), View.OnClickList
     private fun initUI() {
         handleClick()
         eventHandleObserver()
-        weatherViewModel.getWeather()
+//        weatherViewModel.getWeather()
 
     }
 
