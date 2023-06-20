@@ -1,4 +1,4 @@
-package com.chiragtask.ui
+package com.chiragtask.ui.splash
 
 import android.os.Bundle
 import android.view.View

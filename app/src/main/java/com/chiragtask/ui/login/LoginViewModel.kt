@@ -45,9 +45,5 @@ class LoginViewModel() : BaseViewModel() {
                 EventObserver("Please enter username as testapp@google.com and password as Test@123456")
 
         }
-
-
     }
-
-
 }

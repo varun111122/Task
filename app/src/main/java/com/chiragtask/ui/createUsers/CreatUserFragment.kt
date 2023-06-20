@@ -2,20 +2,16 @@ package com.chiragtask.ui.createUsers
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.chiragtask.R
-import com.chiragtask.ui.dashboard.DashRepo
 import com.chiragtask.base.BaseFragment
 import com.chiragtask.databinding.FragmentCreatUserBinding
-import com.chiragtask.db.DashModelFactory
-import com.chiragtask.db.UserDatabase
+import org.koin.android.ext.android.inject
 
 
 class CreatUserFragment : BaseFragment<FragmentCreatUserBinding>(), View.OnClickListener {
-    lateinit var viewModel: CreateViewModel
+    private val viewModel: CreateViewModel by inject()
 
     override fun getLayoutRes() = R.layout.fragment_creat_user
 
@@ -24,10 +20,6 @@ class CreatUserFragment : BaseFragment<FragmentCreatUserBinding>(), View.OnClick
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dao = UserDatabase.getInstance(requireContext()).dao
-        val repository = DashRepo(dao)
-        val factory = DashModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory)[CreateViewModel::class.java]
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 

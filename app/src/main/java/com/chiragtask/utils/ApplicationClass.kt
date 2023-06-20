@@ -3,6 +3,7 @@ package com.chiragtask.utils
 import android.app.Application
 import android.content.Context
 import com.chiragtask.db.UserDatabase
+import com.chiragtask.di.databaseModule
 import com.chiragtask.di.networkingModule
 import com.chiragtask.di.repoModule
 import com.chiragtask.di.viewModelModule
@@ -34,7 +35,7 @@ class ApplicationClass : Application() {
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@ApplicationClass)
-            modules(listOf(networkingModule, viewModelModule, repoModule))
+            modules(listOf(databaseModule,networkingModule, viewModelModule, repoModule))
         }
     }
 

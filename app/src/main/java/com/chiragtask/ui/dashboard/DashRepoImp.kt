@@ -3,7 +3,7 @@ package com.chiragtask.ui.dashboard
 import com.chiragtask.db.UserDao
 import com.chiragtask.db.UserData
 
-class DashRepo(private val dao: UserDao) {
+class DashRepoImp(private val dao: UserDao) {
 
     val allUser = dao.getListOfUser()
 

@@ -1,117 +1,73 @@
 package com.chiragtask.ui.weather
 
 import android.Manifest
+import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.net.Uri
-import android.os.Build
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.viewModels
+import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat.getCurrentLocation
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.apiModel.Weather
+import com.apiModel.WeatherModel
 import com.chiragtask.R
 import com.chiragtask.base.BaseFragment
 import com.chiragtask.data.prefrence.PreferenceDataStore
 import com.chiragtask.databinding.FragmentWeatherBinding
-import com.chiragtask.db.DashModelFactory
-import com.chiragtask.db.UserDatabase
-import com.chiragtask.ui.dashboard.DashRepo
 import com.chiragtask.ui.dashboard.DashboardViewModel
 import com.chiragtask.utils.Constants
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 
 class WeatherFragment : BaseFragment<FragmentWeatherBinding>(), View.OnClickListener {
-    private var fusedLocationClient: FusedLocationProviderClient? = null
-    private var lastLocation: Location? = null
-    private val weatherViewModel: WeatherViewModel by viewModels()
-    lateinit var viewModel: DashboardViewModel
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private val weatherViewModel: WeatherViewModel by inject()
+    private val viewModel: DashboardViewModel by inject()
 
 
     override fun getLayoutRes() = R.layout.fragment_weather
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dao = UserDatabase.getInstance(requireContext()).dao
-        val repository = DashRepo(dao)
-        val factory = DashModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
         binding.lifecycleOwner = this
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        weatherViewModel.getApiResponse().observe(viewLifecycleOwner, this)
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
         initUI()
     }
-    public override fun onStart() {
-        super.onStart()
-        if (!checkPermissions()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions()
-            }
-        }
-        else {
-//            getLastLocation()
-        }
-    }
 
-//    private fun getLastLocation() {
-//        if (ActivityCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return
-//        }
-//        fusedLocationClient?.lastLocation?.addOnCompleteListener(this) { task ->
-//            if (task.isSuccessful && task.result != null) {
-//                lastLocation = task.result
-//                latitudeText!!.text = latitudeLabel + ": " + (lastLocation)!!.latitude
-//                longitudeText!!.text = longitudeLabel + ": " + (lastLocation)!!.longitude
-//            }
-//            else {
-//                Log.d("varun", "getLastLocation:exception", task.exception)
-//                showToastShort("No location detected. Make sure location is enabled on the device.")
-//            }
-//        }
-//    }
-
-    private fun checkPermissions(): Boolean {
-        val permissionState = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        return permissionState == PackageManager.PERMISSION_GRANTED
-    }
 
     private fun initUI() {
         handleClick()
         eventHandleObserver()
-//        weatherViewModel.getWeather()
+        weatherViewModel.getWeather()
+
 
     }
+
 
     override fun <T> onResponseSuccess(value: T, apiCode: String) {
         super.onResponseSuccess(value, apiCode)
 
+        (value as WeatherModel).let {
+            binding.tvLocation.text = "TimeZone is ${it.timezone}"
+            binding.tvTemp.text = "Today Temprature : ${it.current.temp}"
+            binding.tvHumidity.text = "Today Humidity : ${it.current.humidity}"
+            binding.tvWeatherType.text = "Today Weather Type : ${it.current.weather[0].main}"
+            binding.tvWindSpeed.text = "Today wind speed : ${it.current.wind_speed}"
+        }
 
 
     }
@@ -155,76 +111,5 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(), View.OnClickList
         }
     }
 
-
-    private fun startLocationPermissionRequest() {
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-            REQUEST_PERMISSIONS_REQUEST_CODE
-        )
-    }
-    private fun requestPermissions() {
-        val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-            requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        if (shouldProvideRationale) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.")
-            showSnackbar("Location permission is needed for core functionality", "Okay",
-                View.OnClickListener {
-                    startLocationPermissionRequest()
-                })
-        }
-        else {
-            Log.i(TAG, "Requesting permission")
-            startLocationPermissionRequest()
-        }
-    }
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        Log.i(TAG, "onRequestPermissionResult")
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            when {
-                grantResults.isEmpty() -> {
-                    // If user interaction was interrupted, the permission request is cancelled and you
-                    // receive empty arrays.
-                    Log.i(TAG, "User interaction was cancelled.")
-                }
-                grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-                    // Permission granted.
-//                    getLastLocation()
-                }
-                else -> {
-                    showSnackbar("Permission was denied", "Settings",
-                        View.OnClickListener {
-                            // Build intent that displays the App settings screen.
-                            val intent = Intent()
-                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts(
-                                "package",
-                                Build.DISPLAY, null
-                            )
-                            intent.data = uri
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }
-                    )
-                }
-            }
-        }
-    }
-    companion object {
-        private val TAG = "LocationProvider"
-        private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
-    }
-
-    private fun showSnackbar(
-        mainTextStringId: String, actionStringId: String,
-        listener: View.OnClickListener
-    ) {
-        showToastShort(mainTextStringId)
-    }
 
 }

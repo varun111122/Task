@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class DashboardViewModel(private val repository: DashRepo) : BaseViewModel() {
+class DashboardViewModel(private val repository: DashRepoImp) : BaseViewModel() {
 
     var handleEvent = MutableLiveData<EventObserver<String>>()
 

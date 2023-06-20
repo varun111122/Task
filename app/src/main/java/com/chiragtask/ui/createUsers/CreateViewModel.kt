@@ -3,17 +3,16 @@ package com.chiragtask.ui.createUsers
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.chiragtask.ui.dashboard.DashRepo
+import com.chiragtask.ui.dashboard.DashRepoImp
 import com.chiragtask.base.BaseViewModel
 import com.chiragtask.data.network.EventObserver
-import com.chiragtask.data.prefrence.PreferenceDataStore
 import com.chiragtask.db.UserData
 import com.chiragtask.utils.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CreateViewModel(private val repository: DashRepo) : BaseViewModel() {
+class CreateViewModel(private val repository: DashRepoImp) : BaseViewModel() {
 
 
     val inputFirstName = MutableLiveData<String>()
@@ -39,7 +38,6 @@ class CreateViewModel(private val repository: DashRepo) : BaseViewModel() {
         } else if (email.isNullOrBlank()) {
             handleEvent.value = EventObserver("email is empty")
         } else {
-
             insertSubscriber(UserData(0, firstName, lastName, email))
             inputFirstName.value = ""
             inputLastName.value = ""

@@ -4,20 +4,18 @@ package com.chiragtask.ui.dashboard
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.chiragtask.R
 import com.chiragtask.base.BaseFragment
 import com.chiragtask.databinding.FragmentDashBoardBinding
-import com.chiragtask.db.DashModelFactory
 import com.chiragtask.db.UserData
-import com.chiragtask.db.UserDatabase
+import org.koin.android.ext.android.inject
 
 
 class DashBoardFragment : BaseFragment<FragmentDashBoardBinding>(), View.OnClickListener {
-    lateinit var viewModel: DashboardViewModel
+    private val viewModel: DashboardViewModel by inject()
     lateinit var adapterDash: AdapterDash
     private var userList = ArrayList<UserData>()
 
@@ -28,13 +26,7 @@ class DashBoardFragment : BaseFragment<FragmentDashBoardBinding>(), View.OnClick
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dao = UserDatabase.getInstance(requireContext()).dao
-        val repository = DashRepo(dao)
-        val factory = DashModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory)[DashboardViewModel::class.java]
         binding.lifecycleOwner = this
-
-
 
         handleClicks()
         initRecyclerView()

@@ -1,4 +1,4 @@
-package com.chiragtask.ui
+package com.chiragtask.ui.activities
 
 import android.os.Bundle
 import com.chiragtask.R
