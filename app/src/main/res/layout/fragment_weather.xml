@@ -66,23 +66,15 @@
                     android:id="@+id/tvUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Rahul sharma"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="temp: 76.86 \n humidity: 88\n wind_speed: 5.75"
                     android:textSize="@dimen/_16sdp"
-                    app:layout_constraintBottom_toTopOf="@+id/tvUserEmail"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvUserEmail"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="@dimen/_5sdp"
-                    android:layout_height="wrap_content"
-                    android:text="rahul@gmail.com"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:textSize="@dimen/_16sdp"
-                    app:layout_constraintTop_toBottomOf="@+id/tvUserName" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
